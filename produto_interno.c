@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include "timer.h"
+#include <time.h>
 
 float *vetor1, *vetor2;
 
@@ -29,7 +29,6 @@ void* produto_interno(void* args) {
 
     for(int i = inicio; i < fim; i++) {
         prod_thread += vetor1[i]*vetor2[i];
-        printf("%lf\n", prod_thread);
     }
 
     t_ret->id = t_args->id;
@@ -44,7 +43,8 @@ int main (int argc, char* argv[]) {
     double retorno_thread;
     int nthreads;
     double var_relativa;
-    double start, finish, elapsed, resultado_sequencial, resultado_concorrencia = 0;
+    double elapsed, resultado_sequencial, resultado_concorrencia = 0;
+    clock_t start, finish;
     if (argc < 3) {
         printf("Erro! Entrada esperada:\n%s <num threads> <nome arquivo>\n", argv[0]);
         return 1;
@@ -75,7 +75,7 @@ int main (int argc, char* argv[]) {
     // printf("%ld\n", dimensao);
     // printf("\n");
     // printf("%ld\n", resultado_sequencial); 
-    GET_TIME(start);
+    start = clock();
     for (int i = 0; i < nthreads; i++) {
         t_Args* t_args = (t_Args *) malloc(sizeof(t_Args));
         t_args->nthreads = nthreads;
@@ -88,10 +88,11 @@ int main (int argc, char* argv[]) {
         pthread_join(tid[i], (void **) &t_ret);
         resultado_concorrencia += t_ret->prod_thread;
     }
-    GET_TIME(finish);
+    finish = clock();
 
-    elapsed = finish - start;
-    var_relativa = abs((resultado_sequencial - resultado_concorrencia) / resultado_sequencial);
+    elapsed = (double) (finish - start) / CLOCKS_PER_SEC;
+    var_relativa = ((resultado_sequencial - resultado_concorrencia) / resultado_sequencial);
+    if (var_relativa < 0) var_relativa *= -1;
     printf("Result Seq: %lf\nResult Con: %lf\n", resultado_sequencial, resultado_concorrencia);
     printf("Variacao relativa: %f\n", var_relativa);
     printf("Tempo Concorrente: %lf segundos\n", elapsed);
