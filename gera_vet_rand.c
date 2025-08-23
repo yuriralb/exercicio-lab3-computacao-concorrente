@@ -6,7 +6,7 @@ Programa auxiliar para gerar um vetor de floats
 #include <stdlib.h>
 #include <time.h>
 
-#define MAX 100000 //valor maximo de um elemento do vetor
+#define MAX 10000 //valor maximo de um elemento do vetor
 //descomentar o define abaixo caso deseje imprimir uma versao do vetor gerado no formato texto
 //#define LOG 
 

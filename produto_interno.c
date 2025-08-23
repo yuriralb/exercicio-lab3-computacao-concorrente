@@ -1,3 +1,7 @@
+//Nome: Yuri Rocha de Albuquerque
+//DRE: 123166143
+//Programa concorrente que calcula o produto interno entre dois vetores.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -16,6 +20,7 @@ typedef struct {
     double prod_thread;
 } t_Ret;
 
+//Função que será executada por cada thread.
 void* produto_interno(void* args) {
     t_Args* t_args = (t_Args *) args;
     t_Ret* t_ret = (t_Ret*) malloc(sizeof(t_Ret));
@@ -27,7 +32,8 @@ void* produto_interno(void* args) {
         fim = t_args->dimensao;
     }
 
-    for(int i = inicio; i < fim; i++) {
+    //produto parcial de cada thread
+    for(long int i = inicio; i < fim; i++) {
         prod_thread += vetor1[i]*vetor2[i];
     }
 
@@ -58,23 +64,15 @@ int main (int argc, char* argv[]) {
         printf("Erro na abertura do arquivo.");
     }
 
+    //Carrega os dados gerados aleatóriamente
     fread(&dimensao, sizeof(long int), 1, arquivo);
     vetor1 = (float *) malloc(dimensao*sizeof(float));
     vetor2 = (float *) malloc(dimensao*sizeof(float));
     fread(vetor1, sizeof(float), dimensao, arquivo);
     fread(vetor2, sizeof(float), dimensao, arquivo);
     fread(&resultado_sequencial, sizeof(double), 1, arquivo);
-    // for (int i = 0; i < dimensao; i++) {
-    //     printf("%d ", vetor1[i]);
-    // }
-    // printf("\n");
-    // for (int i = 0; i < dimensao; i++) {
-    //     printf("%d ", vetor2[i]);
-    // }
-    // printf("\n");
-    // printf("%ld\n", dimensao);
-    // printf("\n");
-    // printf("%ld\n", resultado_sequencial); 
+
+    //inicia a contagem do tempo
     start = clock();
     for (int i = 0; i < nthreads; i++) {
         t_Args* t_args = (t_Args *) malloc(sizeof(t_Args));
@@ -88,6 +86,7 @@ int main (int argc, char* argv[]) {
         pthread_join(tid[i], (void **) &t_ret);
         resultado_concorrencia += t_ret->prod_thread;
     }
+    //termina contagem do tempo
     finish = clock();
 
     elapsed = (double) (finish - start) / CLOCKS_PER_SEC;
